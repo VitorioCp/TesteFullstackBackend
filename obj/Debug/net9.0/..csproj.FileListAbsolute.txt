@@ -143,3 +143,9 @@ C:\Users\vitco\Documents\TesteFullstackBackend\obj\Debug\net9.0\refint\..dll
 C:\Users\vitco\Documents\TesteFullstackBackend\obj\Debug\net9.0\..pdb
 C:\Users\vitco\Documents\TesteFullstackBackend\obj\Debug\net9.0\..genruntimeconfig.cache
 C:\Users\vitco\Documents\TesteFullstackBackend\obj\Debug\net9.0\ref\..dll
+C:\Users\vitco\Documents\TesteFullstackBackend\bin\Debug\net9.0\frontEnd\package-lock.json
+C:\Users\vitco\Documents\TesteFullstackBackend\bin\Debug\net9.0\frontEnd\package.json
+C:\Users\vitco\Documents\TesteFullstackBackend\bin\Debug\net9.0\frontEnd\tsconfig.app.json
+C:\Users\vitco\Documents\TesteFullstackBackend\bin\Debug\net9.0\frontEnd\tsconfig.json
+C:\Users\vitco\Documents\TesteFullstackBackend\bin\Debug\net9.0\frontEnd\tsconfig.node.json
+C:\Users\vitco\Documents\TesteFullstackBackend\obj\Debug\net9.0\..sourcelink.json
