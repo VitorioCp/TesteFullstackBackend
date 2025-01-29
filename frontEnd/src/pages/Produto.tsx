@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import { Container, Table, TableBody, TableCell, TableHead, TableRow, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 
 interface Produto {
   id: number;
@@ -10,15 +9,25 @@ interface Produto {
 
 function ProdutoList() {
   const [produtos, setProdutos] = useState<Produto[]>([]);
+  const [filteredProdutos, setFilteredProdutos] = useState<Produto[]>([]);
   const [selectedProduto, setSelectedProduto] = useState<Produto | null>(null);
   const [open, setOpen] = useState(false);
-  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     api.get<Produto[]>("/produto").then((response) => {
       setProdutos(response.data);
+      setFilteredProdutos(response.data);
     });
   }, []);
+
+  useEffect(() => {
+    setFilteredProdutos(
+      produtos.filter(produto =>
+        produto.nome.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  }, [searchTerm, produtos]);
 
   const handleDelete = (id: number) => {
     api.delete(`/produto/${id}`)
@@ -52,6 +61,13 @@ function ProdutoList() {
   return (
     <Container>
       <h2>Lista de Produtos</h2>
+      <TextField
+        label="Pesquisar"
+        fullWidth
+        margin="normal"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
       <Button variant="contained" href="/produtos/novo">Novo Produto</Button>
       <Table>
         <TableHead>
@@ -62,7 +78,7 @@ function ProdutoList() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {produtos.map((produto) => (
+          {filteredProdutos.map((produto) => (
             <TableRow key={produto.id}>
               <TableCell>{produto.id}</TableCell>
               <TableCell>{produto.nome}</TableCell>

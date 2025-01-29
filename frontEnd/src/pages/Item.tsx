@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import { Container, Table, TableBody, TableCell, TableHead, TableRow, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 
 interface Item {
   id: number;
@@ -12,15 +11,25 @@ interface Item {
 
 function Itens() {
   const [itens, setItens] = useState<Item[]>([]);
+  const [filteredItens, setFilteredItens] = useState<Item[]>([]);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [open, setOpen] = useState(false);
-  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     api.get("/item").then((response) => {
       setItens(response.data);
+      setFilteredItens(response.data);
     });
   }, []);
+
+  useEffect(() => {
+    setFilteredItens(
+      itens.filter(item =>
+        item.produto.nome.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  }, [searchTerm, itens]);
 
   const handleDelete = (id: number) => {
     api.delete(`/item/${id}`)
@@ -54,6 +63,13 @@ function Itens() {
   return (
     <Container>
       <h2>Lista de Itens</h2>
+      <TextField
+        label="Pesquisar"
+        fullWidth
+        margin="normal"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
       <Button variant="contained" href="/itens/novo">Novo Item</Button>
       <Table>
         <TableHead>
@@ -66,7 +82,7 @@ function Itens() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {itens.map((item) => (
+          {filteredItens.map((item) => (
             <TableRow key={item.id}>
               <TableCell>{item.id}</TableCell>
               <TableCell>{item.produto?.nome}</TableCell>

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import { Container, Table, TableBody, TableCell, TableHead, TableRow, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import Header from "../components/Header";
 
 interface Item {
   id: number;
@@ -19,15 +18,26 @@ interface Carrinho {
 
 function CarrinhoList() {
   const [carrinhos, setCarrinhos] = useState<Carrinho[]>([]);
+  const [filteredCarrinhos, setFilteredCarrinhos] = useState<Carrinho[]>([]);
   const [selectedCarrinho, setSelectedCarrinho] = useState<Carrinho | null>(null);
   const [open, setOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     api.get("/carrinho").then((response) => {
       setCarrinhos(response.data);
+      setFilteredCarrinhos(response.data);
     });
   }, []);
+
+  useEffect(() => {
+    setFilteredCarrinhos(
+      carrinhos.filter(carrinho =>
+        carrinho.identificador.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  }, [searchTerm, carrinhos]);
 
   const handleDelete = (id: number) => {
     api.delete(`/carrinho/${id}`)
@@ -62,6 +72,13 @@ function CarrinhoList() {
     <>
       <Container>
         <h2>Lista de Carrinhos</h2>
+        <TextField
+          label="Pesquisar"
+          fullWidth
+          margin="normal"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
         <Button variant="contained" href="/carrinhos/novo">Novo Carrinho</Button>
         <Table>
           <TableHead>
@@ -73,7 +90,7 @@ function CarrinhoList() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {carrinhos.map((carrinho) => (
+            {filteredCarrinhos.map((carrinho) => (
               <TableRow key={carrinho.id}>
                 <TableCell>{carrinho.id}</TableCell>
                 <TableCell>{carrinho.identificador}</TableCell>
@@ -128,6 +145,40 @@ function CarrinhoList() {
             value={selectedCarrinho?.identificador || ''}
             onChange={(e) => setSelectedCarrinho({ ...selectedCarrinho!, identificador: e.target.value })}
           />
+          {selectedCarrinho?.itensCarrinho.map((item, index) => (
+            <div key={item.id}>
+              <TextField
+                label="Produto"
+                fullWidth
+                margin="normal"
+                value={item.produto.nome}
+                disabled
+              />
+              <TextField
+                label="Quantidade"
+                fullWidth
+                margin="normal"
+                type="number"
+                value={item.quantidade}
+                onChange={(e) => {
+                  const updatedItems = [...selectedCarrinho.itensCarrinho];
+                  updatedItems[index] = { ...updatedItems[index], quantidade: Number(e.target.value) };
+                  setSelectedCarrinho({ ...selectedCarrinho, itensCarrinho: updatedItems });
+                }}
+              />
+              <TextField
+                label="Unidade de Medida"
+                fullWidth
+                margin="normal"
+                value={item.unidadeMedida}
+                onChange={(e) => {
+                  const updatedItems = [...selectedCarrinho.itensCarrinho];
+                  updatedItems[index] = { ...updatedItems[index], unidadeMedida: e.target.value };
+                  setSelectedCarrinho({ ...selectedCarrinho, itensCarrinho: updatedItems });
+                }}
+              />
+            </div>
+          ))}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">

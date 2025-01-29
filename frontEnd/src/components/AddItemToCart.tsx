@@ -6,12 +6,10 @@ import { Container, TextField, Button, MenuItem } from "@mui/material";
 interface Item {
   id: number;
   produto: { nome: string };
-  quantidade: number;
-  unidadeMedida: string;
 }
 
 function AddItemToCart() {
-  const { id, itemId: editItemId } = useParams(); // ID do carrinho e ID do item para edição
+  const { id } = useParams(); // ID do carrinho vindo da URL
   const [itemId, setItemId] = useState("");
   const [quantidade, setQuantidade] = useState("");
   const [unidadeMedida, setUnidadeMedida] = useState("");
@@ -22,38 +20,18 @@ function AddItemToCart() {
     api.get("/item").then((response) => {
       setItens(response.data);
     });
-
-    if (editItemId) {
-      // Carregar dados do item para edição
-      api.get(`/item/${editItemId}`).then((response) => {
-        const item = response.data;
-        setItemId(item.produto.id);
-        setQuantidade(item.quantidade);
-        setUnidadeMedida(item.unidadeMedida);
-      });
-    }
-  }, [editItemId]);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const data = { produtoId: Number(itemId), quantidade: Number(quantidade), unidadeMedida };
-
-    if (editItemId) {
-      // Atualizar item existente
-      api.put(`/carrinho/${id}/item/${editItemId}`, data)
-        .then(() => navigate("/cartlist"))
-        .catch((error) => console.error("Erro ao atualizar item no carrinho!", error));
-    } else {
-      // Adicionar novo item
-      api.post(`/carrinho/${id}/item`, data)
-        .then(() => navigate("/cartlist"))
-        .catch((error) => console.error("Erro ao adicionar item ao carrinho!", error));
-    }
+    api.post(`/carrinho/${id}/item`, { ProdutoId: Number(itemId), quantidade: Number(quantidade), unidadeMedida })
+      .then(() => navigate("/cartlist"))
+      .catch((error) => console.error("Erro ao adicionar item ao carrinho!", error, console.log(itemId)));
   };
 
   return (
     <Container>
-      <h2>{editItemId ? "Editar Item do Carrinho" : "Adicionar Item ao Carrinho"}</h2>
+      <h2>Adicionar Item ao Carrinho</h2>
       <form onSubmit={handleSubmit}>
         <TextField
           select
@@ -93,7 +71,7 @@ function AddItemToCart() {
           <MenuItem value="unidade">Unidade</MenuItem>
         </TextField>
         <Button type="submit" variant="contained">
-          {editItemId ? "Atualizar Item" : "Adicionar Item"}
+          Adicionar Item
         </Button>
       </form>
     </Container>
