@@ -9,5 +9,7 @@ namespace FullstackTestAPI.Data{
         public DbSet<Produto> Produtos { get; set; }
         public DbSet<Item> Itens { get; set; }
         public DbSet<Carrinho> Carrinhos { get; set; }
+    
     }
+
 }

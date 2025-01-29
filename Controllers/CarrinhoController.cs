@@ -24,30 +24,30 @@ namespace FullstackTestAPI.Controllers
             return Ok(carrinhos);
         }
 
-// Adicionar um item ao carrinho
-    [HttpPost("{id}/item")]
-public IActionResult AddItemToCarrinho(int id, [FromBody] Item item)
-{
-    var carrinho = _context.Carrinhos.Include(c => c.ItensCarrinho).FirstOrDefault(c => c.Id == id);
-    if (carrinho == null)
-    {
-        return NotFound("Carrinho não encontrado.");
-    }
+        // Adicionar um item ao carrinho
+        [HttpPost("{id}/item")]
+        public IActionResult AddItemToCarrinho(int id, [FromBody] Item item)
+        {
+            var carrinho = _context.Carrinhos.Include(c => c.ItensCarrinho).FirstOrDefault(c => c.Id == id);
+            if (carrinho == null)
+            {
+                return NotFound("Carrinho não encontrado.");
+            }
 
-    // Associa o ProdutoId ao Item
-    var produto = _context.Produtos.Find(item.ProdutoId);
-    if (produto == null)
-    {
-        return BadRequest("Produto não encontrado.");
-    }
+            // Associa o ProdutoId ao Item
+            var produto = _context.Produtos.Find(item.ProdutoId);
+            if (produto == null)
+            {
+                return BadRequest("Produto não encontrado.");
+            }
 
-    item.Produto = produto; // Associando o produto ao item
-    carrinho.ItensCarrinho.Add(item); // Adiciona o item ao carrinho
+            item.Produto = produto; // Associando o produto ao item
+            carrinho.ItensCarrinho.Add(item); // Adiciona o item ao carrinho
 
-    _context.SaveChanges();
+            _context.SaveChanges();
 
-    return CreatedAtAction(nameof(GetCarrinho), new { id = carrinho.Id }, carrinho);
-}
+            return CreatedAtAction(nameof(GetCarrinho), new { id = carrinho.Id }, carrinho);
+        }
 
 
         // Obter carrinho por ID
@@ -93,14 +93,19 @@ public IActionResult AddItemToCarrinho(int id, [FromBody] Item item)
         [HttpDelete("{id}")]
         public IActionResult DeleteCarrinho(int id)
         {
-            var carrinho = _context.Carrinhos.Find(id);
+            var carrinho = _context.Carrinhos.Include(c => c.ItensCarrinho).FirstOrDefault(c => c.Id == id);
             if (carrinho == null)
                 return NotFound();
 
+            // Remover todos os itens associados ao carrinho
+            _context.Itens.RemoveRange(carrinho.ItensCarrinho);  // Removendo todos os itens
+
+            // Remover o carrinho
             _context.Carrinhos.Remove(carrinho);
             _context.SaveChanges();
 
             return NoContent();
         }
+
     }
 }
