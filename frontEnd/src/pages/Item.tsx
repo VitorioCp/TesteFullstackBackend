@@ -1,13 +1,9 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import { Container, Table, TableBody, TableCell, TableHead, TableRow, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
+import { Item } from "../types/types";
 
-interface Item {
-  id: number;
-  produto: { nome: string };
-  quantidade: number;
-  unidadeMedida: string;
-}
+
 
 function Itens() {
   const [itens, setItens] = useState<Item[]>([]);

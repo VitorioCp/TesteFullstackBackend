@@ -4,11 +4,9 @@ import {
   Container, Table, TableBody, TableCell, TableHead, TableRow, 
   Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField 
 } from "@mui/material";
+import { Produto } from "../types/types";
 
-interface Produto {
-  id: number;
-  nome: string;
-}
+
 
 function ProdutoList() {
   const [produtos, setProdutos] = useState<Produto[]>([]);
@@ -16,13 +14,12 @@ function ProdutoList() {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Buscar produtos ao carregar a página e quando a pesquisa muda
   useEffect(() => {
     api.get<Produto[]>("/produto", {
       params: { nome: searchTerm || undefined }
     })
     .then((response) => setProdutos(response.data))
-    .catch(() => setProdutos([])); // Se erro, exibe lista vazia
+    .catch(() => setProdutos([])); 
   }, [searchTerm]);
 
 
