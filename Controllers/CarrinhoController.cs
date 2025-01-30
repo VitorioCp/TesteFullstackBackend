@@ -50,6 +50,31 @@ namespace FullstackTestAPI.Controllers
         }
 
 
+        // Filtro de itens por nome de produto
+        [HttpGet("filtrar")]
+        public IActionResult GetCarrinhosFiltrados([FromQuery] string nome)
+        {
+            if (string.IsNullOrEmpty(nome))
+            {
+                return BadRequest("O parâmetro de nome é obrigatório.");
+            }
+
+            // Filtrando de forma insensível a maiúsculas/minúsculas
+            var carrinhos = _context.Carrinhos
+                .Include(c => c.ItensCarrinho)
+                .ThenInclude(i => i.Produto)
+                .Where(c => c.ItensCarrinho.Any(i => EF.Functions.Like(i.Produto.Nome.ToLower(), $"%{nome.ToLower()}%")))
+                .ToList();
+
+            if (carrinhos.Count == 0)
+            {
+                return NotFound("Nenhum carrinho encontrado com itens que possuem esse nome de produto.");
+            }
+
+            return Ok(carrinhos);
+        }
+
+
         // Obter carrinho por ID
         [HttpGet("{id}")]
         public IActionResult GetCarrinho(int id)
@@ -72,6 +97,7 @@ namespace FullstackTestAPI.Controllers
             return CreatedAtAction(nameof(GetCarrinho), new { id = carrinho.Id }, carrinho);
         }
 
+
         // Atualizar um carrinho
         [HttpPut("{id}")]
         public IActionResult UpdateCarrinho(int id, Carrinho updatedCarrinho)
@@ -93,19 +119,14 @@ namespace FullstackTestAPI.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteCarrinho(int id)
         {
-            var carrinho = _context.Carrinhos.Include(c => c.ItensCarrinho).FirstOrDefault(c => c.Id == id);
+            var carrinho = _context.Carrinhos.Find(id);
             if (carrinho == null)
                 return NotFound();
 
-            // Remover todos os itens associados ao carrinho
-            _context.Itens.RemoveRange(carrinho.ItensCarrinho);  // Removendo todos os itens
-
-            // Remover o carrinho
             _context.Carrinhos.Remove(carrinho);
             _context.SaveChanges();
 
             return NoContent();
         }
-
     }
 }

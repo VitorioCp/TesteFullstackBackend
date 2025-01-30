@@ -16,6 +16,7 @@ function Itens() {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Carregar itens no useEffect
   useEffect(() => {
     api.get("/item").then((response) => {
       setItens(response.data);
@@ -23,18 +24,28 @@ function Itens() {
     });
   }, []);
 
+  // Realizar a filtragem ao mudar o termo de pesquisa
   useEffect(() => {
-    setFilteredItens(
-      itens.filter(item =>
-        item.produto.nome.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    );
+    const delayDebounceFn = setTimeout(() => {
+      if (searchTerm === "") {
+        setFilteredItens(itens); // Se não houver filtro, mostra todos os itens
+      } else {
+        api.get(`/item/filtrar?nome=${searchTerm}`).then((response) => {
+          setFilteredItens(response.data);
+        }).catch((error) => {
+          console.error("Erro ao buscar itens filtrados", error);
+        });
+      }
+    }, 500); // Debounce de 500ms para evitar muitas requisições
+
+    return () => clearTimeout(delayDebounceFn); // Limpa o timeout ao sair do componente
   }, [searchTerm, itens]);
 
   const handleDelete = (id: number) => {
     api.delete(`/item/${id}`)
       .then(() => {
         setItens(itens.filter(item => item.id !== id));
+        setFilteredItens(filteredItens.filter(item => item.id !== id)); // Atualiza a lista filtrada
       })
       .catch((error) => console.error("Erro ao deletar o item!", error));
   };
@@ -54,6 +65,7 @@ function Itens() {
       api.put(`/item/${selectedItem.id}`, selectedItem)
         .then(() => {
           setItens(itens.map(i => i.id === selectedItem.id ? selectedItem : i));
+          setFilteredItens(filteredItens.map(i => i.id === selectedItem.id ? selectedItem : i)); // Atualiza a lista filtrada
           handleClose();
         })
         .catch((error) => console.error("Erro ao atualizar o item!", error));
@@ -68,7 +80,7 @@ function Itens() {
         fullWidth
         margin="normal"
         value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        onChange={(e) => setSearchTerm(e.target.value)} // Atualiza o searchTerm
       />
       <Button variant="contained" href="/itens/novo">Novo Item</Button>
       <Table>

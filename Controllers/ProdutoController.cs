@@ -15,10 +15,38 @@ namespace FullstackTestAPI.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public IActionResult GetProdutos()
+        // Filtrar produtos por nome
+        [HttpGet("filtrar")]
+        public IActionResult GetProdutosFiltrados([FromQuery] string nome)
         {
-            return Ok(_context.Produtos.ToList());
+            if (string.IsNullOrEmpty(nome))
+            {
+                return BadRequest("O parâmetro de nome é obrigatório.");
+            }
+
+            // Filtrando de forma insensível a maiúsculas/minúsculas
+            var produtos = _context.Produtos
+                .Where(p => p.Nome.ToLower().Contains(nome.ToLower()))
+                .ToList();
+
+            if (produtos.Count == 0)
+            {
+                return NotFound("Nenhum produto encontrado com esse nome.");
+            }
+
+            return Ok(produtos);
+        }
+        [HttpGet]
+        public IActionResult GetProdutos([FromQuery] string? nome)
+        {
+            var produtos = _context.Produtos.AsQueryable();
+
+            if (!string.IsNullOrEmpty(nome))
+            {
+                produtos = produtos.Where(p => p.Nome.ToLower().Contains(nome.ToLower()));
+            }
+
+            return Ok(produtos.ToList());
         }
 
         [HttpPost]
@@ -55,6 +83,6 @@ namespace FullstackTestAPI.Controllers
             _context.SaveChanges();
             return NoContent();
         }
-        
+
     }
 }

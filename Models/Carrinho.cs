@@ -4,6 +4,6 @@ namespace FullstackTestAPI.Models
     {
         public int Id { get; set; }
         public string Identificador { get; set; }
-        public List<Item>? ItensCarrinho { get; set; }
+        public List<Item>?  ItensCarrinho { get; set; }
     }
 }

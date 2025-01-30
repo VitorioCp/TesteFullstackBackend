@@ -2,6 +2,8 @@ using FullstackTestAPI.Data;
 using FullstackTestAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+
 namespace FullstackTestAPI.Controllers
 {
     [Route("api/[controller]")]
@@ -73,6 +75,29 @@ namespace FullstackTestAPI.Controllers
             _context.SaveChanges();
 
             return NoContent();
+        }
+
+        // Filtro de itens por nome de produto
+        [HttpGet("filtrar")]
+        public IActionResult GetItensFiltrados([FromQuery] string nome)
+        {
+            if (string.IsNullOrEmpty(nome))
+            {
+                return BadRequest("O parâmetro de nome é obrigatório.");
+            }
+
+            // Filtrando de forma insensível a maiúsculas/minúsculas
+            var itens = _context.Itens
+                .Include(i => i.Produto)
+                .Where(i => EF.Functions.Like(i.Produto.Nome.ToLower(), $"%{nome.ToLower()}%"))
+                .ToList();
+
+            if (itens.Count == 0)
+            {
+                return NotFound("Nenhum item encontrado com esse nome.");
+            }
+
+            return Ok(itens);
         }
 
         // Deletar um item

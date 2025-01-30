@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import { Container, Table, TableBody, TableCell, TableHead, TableRow, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import Header from "../components/Header";
 
 interface Item {
   id: number;
@@ -32,17 +33,26 @@ function CarrinhoList() {
   }, []);
 
   useEffect(() => {
-    setFilteredCarrinhos(
-      carrinhos.filter(carrinho =>
-        carrinho.identificador.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    );
+    const delayDebounceFn = setTimeout(() => {
+      if (searchTerm === "") {
+        setFilteredCarrinhos(carrinhos); // Se não houver filtro, mostra todos os carrinhos
+      } else {
+        api.get(`/carrinho/filtrar?nome=${searchTerm}`).then((response) => {
+          setFilteredCarrinhos(response.data);
+        }).catch((error) => {
+          console.error("Erro ao buscar carrinhos filtrados", error);
+        });
+      }
+    }, 500); // Debounce de 500ms para evitar muitas requisições
+
+    return () => clearTimeout(delayDebounceFn); // Limpa o timeout ao sair do componente
   }, [searchTerm, carrinhos]);
 
   const handleDelete = (id: number) => {
     api.delete(`/carrinho/${id}`)
       .then(() => {
         setCarrinhos(carrinhos.filter(carrinho => carrinho.id !== id));
+        setFilteredCarrinhos(filteredCarrinhos.filter(carrinho => carrinho.id !== id)); // Atualiza a lista filtrada
       })
       .catch((error) => console.error("Erro ao deletar o carrinho!", error));
   };
@@ -62,6 +72,7 @@ function CarrinhoList() {
       api.put(`/carrinho/${selectedCarrinho.id}`, selectedCarrinho)
         .then(() => {
           setCarrinhos(carrinhos.map(c => c.id === selectedCarrinho.id ? selectedCarrinho : c));
+          setFilteredCarrinhos(filteredCarrinhos.map(c => c.id === selectedCarrinho.id ? selectedCarrinho : c)); // Atualiza a lista filtrada
           handleClose();
         })
         .catch((error) => console.error("Erro ao atualizar o carrinho!", error));
@@ -70,6 +81,7 @@ function CarrinhoList() {
 
   return (
     <>
+      <Header />
       <Container>
         <h2>Lista de Carrinhos</h2>
         <TextField

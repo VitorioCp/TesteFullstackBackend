@@ -25,6 +25,7 @@ function ProdutoForm() {
           fullWidth
           value={nome}
           onChange={(e) => setNome(e.target.value)}
+          required
         />
         <Button type="submit" variant="contained">Salvar</Button>
       </form>

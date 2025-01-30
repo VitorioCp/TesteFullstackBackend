@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
-import { Container, Table, TableBody, TableCell, TableHead, TableRow, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
+import { 
+  Container, Table, TableBody, TableCell, TableHead, TableRow, 
+  Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField 
+} from "@mui/material";
 
 interface Produto {
   id: number;
@@ -9,26 +12,21 @@ interface Produto {
 
 function ProdutoList() {
   const [produtos, setProdutos] = useState<Produto[]>([]);
-  const [filteredProdutos, setFilteredProdutos] = useState<Produto[]>([]);
   const [selectedProduto, setSelectedProduto] = useState<Produto | null>(null);
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Buscar produtos ao carregar a página e quando a pesquisa muda
   useEffect(() => {
-    api.get<Produto[]>("/produto").then((response) => {
-      setProdutos(response.data);
-      setFilteredProdutos(response.data);
-    });
-  }, []);
+    api.get<Produto[]>("/produto", {
+      params: { nome: searchTerm || undefined }
+    })
+    .then((response) => setProdutos(response.data))
+    .catch(() => setProdutos([])); // Se erro, exibe lista vazia
+  }, [searchTerm]);
 
-  useEffect(() => {
-    setFilteredProdutos(
-      produtos.filter(produto =>
-        produto.nome.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    );
-  }, [searchTerm, produtos]);
 
+  
   const handleDelete = (id: number) => {
     api.delete(`/produto/${id}`)
       .then(() => {
@@ -68,7 +66,9 @@ function ProdutoList() {
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      <Button variant="contained" href="/produtos/novo">Novo Produto</Button>
+      <Button variant="contained" href="/produtos/novo" sx={{ mb: 2 }}>
+        Novo Produto
+      </Button>
       <Table>
         <TableHead>
           <TableRow>
@@ -78,29 +78,37 @@ function ProdutoList() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {filteredProdutos.map((produto) => (
-            <TableRow key={produto.id}>
-              <TableCell>{produto.id}</TableCell>
-              <TableCell>{produto.nome}</TableCell>
-              <TableCell>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => handleEdit(produto)}
-                  style={{ marginRight: '8px' }}
-                >
-                  Editar
-                </Button>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={() => handleDelete(produto.id)}
-                >
-                  Deletar
-                </Button>
+          {produtos.length > 0 ? (
+            produtos.map((produto) => (
+              <TableRow key={produto.id}>
+                <TableCell>{produto.id}</TableCell>
+                <TableCell>{produto.nome}</TableCell>
+                <TableCell>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => handleEdit(produto)}
+                    sx={{ mr: 1 }}
+                  >
+                    Editar
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => handleDelete(produto.id)}
+                  >
+                    Deletar
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={3} align="center">
+                Nenhum produto encontrado.
               </TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </Table>
 
