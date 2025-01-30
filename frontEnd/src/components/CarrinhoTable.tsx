@@ -1,12 +1,8 @@
 import { Table, TableBody, TableCell, TableHead, TableRow, Button } from "@mui/material";
-import { Carrinho } from "../types/types";
+import { CarrinhoTableProps } from "../types/types";
 import { useNavigate } from "react-router-dom";
 
-interface CarrinhoTableProps {
-  carrinhos: Carrinho[];
-  onEdit: (carrinho: Carrinho) => void;
-  onDelete: (id: number) => void;
-}
+
 
 const CarrinhoTable: React.FC<CarrinhoTableProps> = ({ carrinhos, onEdit, onDelete }) => {
   const navigate = useNavigate();

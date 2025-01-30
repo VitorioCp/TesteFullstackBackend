@@ -1,13 +1,7 @@
 import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button } from "@mui/material";
-import { Carrinho } from "../types/types";
+import { EditCarrinhoModalProps } from "../types/types";
 
-interface EditCarrinhoModalProps {
-  open: boolean;
-  carrinho: Carrinho | null;
-  onClose: () => void;
-  onSave: (carrinho: Carrinho) => void;
-  setCarrinho: (carrinho: Carrinho) => void;
-}
+
 
 const EditCarrinhoModal: React.FC<EditCarrinhoModalProps> = ({ open, carrinho, onClose, onSave, setCarrinho }) => {
   if (!carrinho) return null;

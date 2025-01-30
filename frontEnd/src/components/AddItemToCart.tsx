@@ -2,11 +2,9 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { Container, TextField, Button, MenuItem } from "@mui/material";
+import { Item } from "../types/types";
 
-interface Item {
-  id: number;
-  produto: { nome: string };
-}
+
 
 function AddItemToCart() {
   const { id } = useParams(); // ID do carrinho vindo da URL

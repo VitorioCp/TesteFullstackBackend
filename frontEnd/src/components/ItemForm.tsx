@@ -2,11 +2,8 @@ import { useState, useEffect } from "react";
 import api from "../services/api";
 import { Container, TextField, Button, MenuItem } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { Produto } from "../types/types";
 
-interface Produto {
-  id: number;
-  nome: string;
-}
 
 function ItemForm() {
   const [produtoId, setProdutoId] = useState("");
