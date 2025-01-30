@@ -1,5 +1,5 @@
 import { Table, TableBody, TableCell, TableHead, TableRow, Button } from "@mui/material";
-import { Item, ItemTableProps } from "../types/types";
+import { ItemTableProps } from "../types/types";
 
 
 

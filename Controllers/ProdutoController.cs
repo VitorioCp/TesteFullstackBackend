@@ -15,7 +15,6 @@ namespace FullstackTestAPI.Controllers
             _context = context;
         }
 
-        // Filtrar produtos por nome
         [HttpGet("filtrar")]
         public IActionResult GetProdutosFiltrados([FromQuery] string nome)
         {
@@ -24,7 +23,6 @@ namespace FullstackTestAPI.Controllers
                 return BadRequest("O parâmetro de nome é obrigatório.");
             }
 
-            // Filtrando de forma insensível a maiúsculas/minúsculas
             var produtos = _context.Produtos
                 .Where(p => p.Nome.ToLower().Contains(nome.ToLower()))
                 .ToList();

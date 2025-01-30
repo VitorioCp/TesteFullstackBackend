@@ -7,7 +7,7 @@ import { Item } from "../types/types";
 
 
 function AddItemToCart() {
-  const { id } = useParams(); // ID do carrinho vindo da URL
+  const { id } = useParams();
   const [itemId, setItemId] = useState("");
   const [quantidade, setQuantidade] = useState("");
   const [unidadeMedida, setUnidadeMedida] = useState("");

@@ -16,7 +16,6 @@ namespace FullstackTestAPI.Controllers
             _context = context;
         }
 
-        // Listar todos os carrinhos
         [HttpGet]
         public IActionResult GetCarrinhos()
         {
@@ -24,7 +23,6 @@ namespace FullstackTestAPI.Controllers
             return Ok(carrinhos);
         }
 
-        // Adicionar um item ao carrinho
         [HttpPost("{id}/item")]
         public IActionResult AddItemToCarrinho(int id, [FromBody] Item item)
         {
@@ -34,22 +32,20 @@ namespace FullstackTestAPI.Controllers
                 return NotFound("Carrinho não encontrado.");
             }
 
-            // Associa o ProdutoId ao Item
             var produto = _context.Produtos.Find(item.ProdutoId);
             if (produto == null)
             {
                 return BadRequest("Produto não encontrado.");
             }
 
-            item.Produto = produto; // Associando o produto ao item
-            carrinho.ItensCarrinho.Add(item); // Adiciona o item ao carrinho
+            item.Produto = produto; 
+            carrinho.ItensCarrinho.Add(item); 
 
             _context.SaveChanges();
 
             return CreatedAtAction(nameof(GetCarrinho), new { id = carrinho.Id }, carrinho);
         }
 
-        // Filtro de carrinhos por identificador
         [HttpGet("filtrar")]
         public IActionResult GetCarrinhosFiltrados([FromQuery] string identificador)
         {
@@ -58,7 +54,6 @@ namespace FullstackTestAPI.Controllers
                 return BadRequest("O parâmetro de identificador é obrigatório.");
             }
 
-            // Filtrando de forma insensível a maiúsculas/minúsculas
             var carrinhos = _context.Carrinhos
                 .Include(c => c.ItensCarrinho)
                 .ThenInclude(i => i.Produto)
@@ -73,7 +68,6 @@ namespace FullstackTestAPI.Controllers
             return Ok(carrinhos);
         }
 
-        // Obter carrinho por ID
         [HttpGet("{id}")]
         public IActionResult GetCarrinho(int id)
         {
@@ -85,7 +79,6 @@ namespace FullstackTestAPI.Controllers
             return Ok(carrinho);
         }
 
-        // Criar um novo carrinho
         [HttpPost]
         public IActionResult AddCarrinho(Carrinho carrinho)
         {
@@ -95,7 +88,6 @@ namespace FullstackTestAPI.Controllers
             return CreatedAtAction(nameof(GetCarrinho), new { id = carrinho.Id }, carrinho);
         }
 
-        // Atualizar um carrinho
         [HttpPut("{id}")]
         public IActionResult UpdateCarrinho(int id, Carrinho updatedCarrinho)
         {
@@ -112,7 +104,6 @@ namespace FullstackTestAPI.Controllers
             return NoContent();
         }
 
-        // Deletar um carrinho
         [HttpDelete("{id}")]
         public IActionResult DeleteCarrinho(int id)
         {
@@ -120,7 +111,6 @@ namespace FullstackTestAPI.Controllers
             if (carrinho == null)
                 return NotFound();
 
-            // Remover os itens relacionados
             if (carrinho.ItensCarrinho != null && carrinho.ItensCarrinho.Any())
             {
                 _context.Itens.RemoveRange(carrinho.ItensCarrinho);
