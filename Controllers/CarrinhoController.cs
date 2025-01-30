@@ -49,31 +49,29 @@ namespace FullstackTestAPI.Controllers
             return CreatedAtAction(nameof(GetCarrinho), new { id = carrinho.Id }, carrinho);
         }
 
-
-        // Filtro de itens por nome de produto
+        // Filtro de carrinhos por identificador
         [HttpGet("filtrar")]
-        public IActionResult GetCarrinhosFiltrados([FromQuery] string nome)
+        public IActionResult GetCarrinhosFiltrados([FromQuery] string identificador)
         {
-            if (string.IsNullOrEmpty(nome))
+            if (string.IsNullOrEmpty(identificador))
             {
-                return BadRequest("O parâmetro de nome é obrigatório.");
+                return BadRequest("O parâmetro de identificador é obrigatório.");
             }
 
             // Filtrando de forma insensível a maiúsculas/minúsculas
             var carrinhos = _context.Carrinhos
                 .Include(c => c.ItensCarrinho)
                 .ThenInclude(i => i.Produto)
-                .Where(c => c.ItensCarrinho.Any(i => EF.Functions.Like(i.Produto.Nome.ToLower(), $"%{nome.ToLower()}%")))
+                .Where(c => EF.Functions.Like(c.Identificador.ToLower(), $"%{identificador.ToLower()}%"))
                 .ToList();
 
             if (carrinhos.Count == 0)
             {
-                return NotFound("Nenhum carrinho encontrado com itens que possuem esse nome de produto.");
+                return NotFound("Nenhum carrinho encontrado com esse identificador.");
             }
 
             return Ok(carrinhos);
         }
-
 
         // Obter carrinho por ID
         [HttpGet("{id}")]
@@ -96,7 +94,6 @@ namespace FullstackTestAPI.Controllers
 
             return CreatedAtAction(nameof(GetCarrinho), new { id = carrinho.Id }, carrinho);
         }
-
 
         // Atualizar um carrinho
         [HttpPut("{id}")]

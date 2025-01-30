@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import { Container, Table, TableBody, TableCell, TableHead, TableRow, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import Header from "../components/Header";
 
 interface Item {
   id: number;
@@ -37,7 +36,7 @@ function CarrinhoList() {
       if (searchTerm === "") {
         setFilteredCarrinhos(carrinhos); // Se não houver filtro, mostra todos os carrinhos
       } else {
-        api.get(`/carrinho/filtrar?nome=${searchTerm}`).then((response) => {
+        api.get(`/carrinho/filtrar?identificador=${searchTerm}`).then((response) => {
           setFilteredCarrinhos(response.data);
         }).catch((error) => {
           console.error("Erro ao buscar carrinhos filtrados", error);
@@ -81,7 +80,6 @@ function CarrinhoList() {
 
   return (
     <>
-      <Header />
       <Container>
         <h2>Lista de Carrinhos</h2>
         <TextField
