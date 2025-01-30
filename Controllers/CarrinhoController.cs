@@ -116,14 +116,21 @@ namespace FullstackTestAPI.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteCarrinho(int id)
         {
-            var carrinho = _context.Carrinhos.Find(id);
+            var carrinho = _context.Carrinhos.Include(c => c.ItensCarrinho).FirstOrDefault(c => c.Id == id);
             if (carrinho == null)
                 return NotFound();
+
+            // Remover os itens relacionados
+            if (carrinho.ItensCarrinho != null && carrinho.ItensCarrinho.Any())
+            {
+                _context.Itens.RemoveRange(carrinho.ItensCarrinho);
+            }
 
             _context.Carrinhos.Remove(carrinho);
             _context.SaveChanges();
 
             return NoContent();
         }
+
     }
 }
